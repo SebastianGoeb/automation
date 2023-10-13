@@ -59,7 +59,7 @@ if [ "$num_errors" -ne 0 ]; then
 
   gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
     -X PATCH \
-    -F "conclusion=neutral" \
+    -F "conclusion=action_required" \
     -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
     -F "output.title=Repo is Misconfigured" \
     -F "output.summary=$num_errors errors"
