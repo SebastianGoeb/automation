@@ -42,6 +42,30 @@ gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
   -f "description=$num_errors errors" \
   -f "context=continuous-integration/my-check"
 
+# Create a new check run
+response=$(
+  gh api "repos/${GITHUB_REPOSITORY}/check-runs" \
+    -X POST \
+    -F "name=My Custom Check" \
+    -F "head_sha=${GITHUB_SHA}" \
+    -F "status=in_progress" \
+    -F "started_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+)
+
+# Extract the check_run_id from the response
+check_run_id=$(echo "$response" | jq .id)
+
+# ... Here you'd run your checks ...
+sleep 10
+
+# After your checks, update the check run with a conclusion
+gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
+  -X PATCH \
+  -F "conclusion=success" \
+  -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+  -F "output.title=Check Results" \
+  -F "output.summary=$num_errors errors"
+
 # report errors
 if [ "$num_errors" -ne 0 ]; then
   printf "%s\n" "${errors[@]}"
