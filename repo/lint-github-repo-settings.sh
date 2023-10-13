@@ -59,9 +59,14 @@ if [ "$num_errors" -ne 0 ]; then
 
   gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
     -X PATCH \
-    -F "conclusion=failure" \
-    -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-    -F "{\"output\": {\"title\": \"Repo is Misconfigured\", \"summary\": \"$num_errors errors\"}}"
+    -f "{
+      \"conclusion\": \"failure\",
+      \"completed_at\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
+      \"output\": {
+        \"title\": \"Repo is Misconfigured\",
+        \"summary\": \"$num_errors errors\"
+      }
+    }"
 
   exit 1
 else
@@ -69,7 +74,12 @@ else
 
   gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
     -X PATCH \
-    -F "conclusion=success" \
-    -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-    -F "{\"output\": {\"title\": \"Repo Settings are Good\", \"summary\": \"all good\"}}"
+    -f "{
+      \"conclusion\": \"failure\",
+      \"completed_at\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
+      \"output\": {
+        \"title\": \"Repo Settings are Good\",
+        \"summary\": \"all good\"
+      }
+    }"
 fi
