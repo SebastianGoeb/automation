@@ -36,18 +36,18 @@ echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 
 num_errors="${#errors[@]}"
 
-# gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-#   -X POST \
-#   -f "state=error" \
-#   -f "description=$num_errors errors" \
-#   -f "context=continuous-integration/my-check"
+gh api "repos/${GITHUB_REPOSITORY}/statuses/${PR_SHA}" \
+  -X POST \
+  -f "state=error" \
+  -f "description=$num_errors errors" \
+  -f "context=continuous-integration/my-check"
 
 # Create a new check run
 response=$(
   gh api "repos/{owner}/{repo}/check-runs" \
     -X POST \
     -F "name=My Custom Check" \
-    -F "head_sha=${GITHUB_SHA}" \
+    -F "head_sha=${PR_SHA}" \
     -F "status=in_progress" \
     -F "started_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 )
