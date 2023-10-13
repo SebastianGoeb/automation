@@ -3,6 +3,11 @@ name: PR
 on:
   pull_request:
 
+permissions:
+  contents: read
+  statuses: write
+  checks: write
+
 jobs:
   lint-repo-settings:
     uses: ./.github/workflows/lint-repo-settings.yml
