@@ -58,25 +58,23 @@ current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ "$num_errors" -ne 0 ]; then
   printf "%s\n" "${errors[@]}"
 
+  json_payload=$(
+    jq -n \
+      --arg completed_at "$current_date" \
+      --arg summary "$num_errors errors" \
+      '{
+      "conclusion": "failure",
+      "completed_at": $completed_at,
+      "output": {
+        "title": "Repo is Misconfigured",
+        "summary": $summary
+      }
+    }'
+  )
+
   gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
     -X PATCH \
-    -f conclusion=failure \
-    -f completed_at="$current_date" \
-    -f output='{
-  "title": "Repo is Misconfigured",
-  "summary": "'"$num_errors errors"'"
-}'
-
-  # gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
-  #   -X PATCH \
-  #   -f "{
-  #     \"conclusion\": \"failure\",
-  #     \"completed_at\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
-  #     \"output\": {
-  #       \"title\": \"Repo is Misconfigured\",
-  #       \"summary\": \"$num_errors errors\"
-  #     }
-  #   }"
+    --input <(echo "$json_payload")
 
   exit 1
 else
