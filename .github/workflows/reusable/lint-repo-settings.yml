@@ -1,0 +1,16 @@
+name: Lint Repo Settings
+on:
+  workflow_call:
+
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
+jobs:
+  lint-repo-settings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Lint Repo Settings
+        run: ./repo/lint-github-repo-settings.sh

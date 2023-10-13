@@ -1,0 +1,8 @@
+name: PR
+
+on:
+  pull_request:
+
+jobs:
+  lint-repo-settings:
+    uses: ./.github/workflows/lint-repo-settings.yml
