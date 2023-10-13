@@ -5,4 +5,4 @@ on:
 
 jobs:
   lint-repo-settings:
-    uses: ./.github/workflows/lint-repo-settings.yml
+    uses: ./.github/workflows/reusable/lint-repo-settings.yml
