@@ -54,19 +54,29 @@ num_errors="${#errors[@]}"
 #   -f "context=continuous-integration/my-check"
 
 # report errors
+current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ "$num_errors" -ne 0 ]; then
   printf "%s\n" "${errors[@]}"
 
-  gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
+  gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
     -X PATCH \
-    -f "{
-      \"conclusion\": \"failure\",
-      \"completed_at\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
-      \"output\": {
-        \"title\": \"Repo is Misconfigured\",
-        \"summary\": \"$num_errors errors\"
-      }
-    }"
+    -f conclusion=failure \
+    -f completed_at="$current_date" \
+    -f output='{
+  "title": "Repo is Misconfigured",
+  "summary": "'"$num_errors errors"'"
+}'
+
+  # gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
+  #   -X PATCH \
+  #   -f "{
+  #     \"conclusion\": \"failure\",
+  #     \"completed_at\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
+  #     \"output\": {
+  #       \"title\": \"Repo is Misconfigured\",
+  #       \"summary\": \"$num_errors errors\"
+  #     }
+  #   }"
 
   exit 1
 else
