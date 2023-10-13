@@ -36,15 +36,15 @@ echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 
 num_errors="${#errors[@]}"
 
-gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-  -X POST \
-  -f "state=error" \
-  -f "description=$num_errors errors" \
-  -f "context=continuous-integration/my-check"
+# gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+#   -X POST \
+#   -f "state=error" \
+#   -f "description=$num_errors errors" \
+#   -f "context=continuous-integration/my-check"
 
 # Create a new check run
 response=$(
-  gh api "repos/${GITHUB_REPOSITORY}/check-runs" \
+  gh api "repos/{owner}/{repo}/check-runs" \
     -X POST \
     -F "name=My Custom Check" \
     -F "head_sha=${GITHUB_SHA}" \
@@ -52,14 +52,18 @@ response=$(
     -F "started_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 )
 
+echo
+echo "$response"
+
 # Extract the check_run_id from the response
 check_run_id=$(echo "$response" | jq .id)
 
 # ... Here you'd run your checks ...
+echo "sleeping"
 sleep 10
 
 # After your checks, update the check run with a conclusion
-gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
+gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
   -X PATCH \
   -F "conclusion=success" \
   -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
