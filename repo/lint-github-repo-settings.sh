@@ -18,6 +18,17 @@ function validate_jq() {
   fi
 }
 
+# Create a new check run
+check_run=$(
+  gh api "repos/{owner}/{repo}/check-runs" \
+    -X POST \
+    -F "name=Lint Repo Settings" \
+    -F "head_sha=${PR_SHA}" \
+    -F "status=in_progress" \
+    -F "started_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+)
+check_run_id=$(echo "$check_run" | jq .id)
+
 # fetch json for the git repo we are currently in
 repo=$(gh api 'repos/{owner}/{repo}')
 
@@ -36,44 +47,31 @@ echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 
 num_errors="${#errors[@]}"
 
-gh api "repos/${GITHUB_REPOSITORY}/statuses/${PR_SHA}" \
-  -X POST \
-  -f "state=error" \
-  -f "description=$num_errors errors" \
-  -f "context=continuous-integration/my-check"
-
-# Create a new check run
-response=$(
-  gh api "repos/{owner}/{repo}/check-runs" \
-    -X POST \
-    -F "name=My Custom Check" \
-    -F "head_sha=${PR_SHA}" \
-    -F "status=in_progress" \
-    -F "started_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-)
-
-echo
-echo "$response"
-
-# Extract the check_run_id from the response
-check_run_id=$(echo "$response" | jq .id)
-
-# ... Here you'd run your checks ...
-echo "sleeping"
-sleep 10
-
-# After your checks, update the check run with a conclusion
-gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
-  -X PATCH \
-  -F "conclusion=success" \
-  -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-  -F "output.title=Check Results" \
-  -F "output.summary=$num_errors errors"
+# gh api "repos/${GITHUB_REPOSITORY}/statuses/${PR_SHA}" \
+#   -X POST \
+#   -f "state=error" \
+#   -f "description=$num_errors errors" \
+#   -f "context=continuous-integration/my-check"
 
 # report errors
 if [ "$num_errors" -ne 0 ]; then
   printf "%s\n" "${errors[@]}"
+
+  gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
+    -X PATCH \
+    -F "conclusion=error" \
+    -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+    -F "output.title=Repo is Misconfigured" \
+    -F "output.summary=$num_errors errors"
+
   exit 1
 else
   echo "all good!"
+
+  gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
+    -X PATCH \
+    -F "conclusion=success" \
+    -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+    -F "output.title=Repo Settings are Good" \
+    -F "output.summary=all good"
 fi
