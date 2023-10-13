@@ -61,8 +61,7 @@ if [ "$num_errors" -ne 0 ]; then
     -X PATCH \
     -F "conclusion=failure" \
     -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-    -F "output.title=Repo is Misconfigured" \
-    -F "output.summary=$num_errors errors"
+    -F "{\"output\": {\"title\": \"Repo is Misconfigured\", \"summary\": \"$num_errors errors\"}}"
 
   exit 1
 else
@@ -72,6 +71,5 @@ else
     -X PATCH \
     -F "conclusion=success" \
     -F "completed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-    -F "output.title=Repo Settings are Good" \
-    -F "output.summary=all good"
+    -F "{\"output\": {\"title\": \"Repo Settings are Good\", \"summary\": \"all good\"}}"
 fi
