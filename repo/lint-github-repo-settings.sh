@@ -34,8 +34,15 @@ echo "::notice file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 echo "::warning file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 
-# report errors
 num_errors="${#errors[@]}"
+
+gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+  -X POST \
+  -f "state=error" \
+  -f "description=$num_errors errors" \
+  -f "context=continuous-integration/my-check"
+
+# report errors
 if [ "$num_errors" -ne 0 ]; then
   printf "%s\n" "${errors[@]}"
   exit 1
