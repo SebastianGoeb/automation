@@ -5,6 +5,11 @@ on:
 env:
   GITHUB_TOKEN: ${{ github.token }}
 
+permissions:
+  contents: read
+  statuses: write
+  checks: write
+
 jobs:
   lint-repo-settings:
     runs-on: ubuntu-latest
