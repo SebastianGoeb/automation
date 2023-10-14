@@ -16,6 +16,7 @@ function validate_jq() {
 }
 
 # Create a new check run
+echo "::group::creating check run"
 check_run=$(
   gh api "repos/{owner}/{repo}/check-runs" \
     -X POST \
@@ -25,9 +26,12 @@ check_run=$(
     -F "started_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 )
 check_run_id=$(echo "$check_run" | jq .id)
+echo "::endgroup::"
 
 # fetch json for the git repo we are currently in
 repo=$(gh api 'repos/{owner}/{repo}')
+
+echo "$repo" | jq
 
 # validate what we care about
 validate_jq "$repo" '.allow_squash_merge' 'true'
@@ -47,6 +51,7 @@ if [ "$num_errors" -ne 0 ]; then
     echo "::error ::$err"
   done
 
+  echo "::group::updating check run"
   json_payload=$(
     jq -n \
       --arg completed_at "$current_date" \
@@ -61,15 +66,16 @@ if [ "$num_errors" -ne 0 ]; then
       }
     }'
   )
-
   gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
     -X PATCH \
     --input <(echo "$json_payload")
+  echo "::endgroup::"
 
   exit 1
 else
   echo "all good!"
 
+  echo "::group::updating check run"
   json_payload=$(
     jq -n \
       --arg completed_at "$current_date" \
@@ -82,8 +88,8 @@ else
       }
     }'
   )
-
   gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
     -X PATCH \
     --input <(echo "$json_payload")
+  echo "::endgroup::"
 fi
