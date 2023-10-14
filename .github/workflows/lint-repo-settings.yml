@@ -2,12 +2,8 @@ name: Lint Repo Settings
 on:
   workflow_call:
 
-env:
-  GITHUB_TOKEN: ${{ github.token }}
-
 permissions:
   contents: read
-  statuses: write
   checks: write
 
 jobs:
@@ -21,4 +17,5 @@ jobs:
         env:
           PR_SHA: ${{ github.event.pull_request.head.sha }}
           LINT_REPO_SETTINGS_PAT: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: ./repo/lint-github-repo-settings.sh
