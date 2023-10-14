@@ -11,10 +11,7 @@ function validate_jq() {
   actual=$(echo "$json" | jq -r "$query")
 
   if ! echo "$actual" | grep -q "$expected"; then
-    errors+=("$query is set incorrectly:
-    expected: $expected
-    but was:  $actual
-")
+    errors+=("expected $query to be $expected but was $actual")
   fi
 }
 
@@ -41,17 +38,11 @@ validate_jq "$repo" '.delete_branch_on_merge' 'true'
 validate_jq "$repo" '.allow_update_branch' 'true'
 validate_jq "$repo" '.use_squash_pr_title_as_default' 'true'
 
-# echo "::notice file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
-# echo "::warning file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
-# echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
-
 num_errors="${#errors[@]}"
 
 # report errors
 current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ "$num_errors" -ne 0 ]; then
-  printf "%s\n" "${errors[@]}"
-
   for err in "${errors[@]}"; do
     echo "::error ::$err"
   done
