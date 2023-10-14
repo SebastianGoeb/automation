@@ -20,5 +20,5 @@ jobs:
       - name: Lint Repo Settings
         env:
           PR_SHA: ${{ github.event.pull_request.head.sha }}
-          GITHUB_TOKEN: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
+          LINT_REPO_SETTINGS_PAT: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
         run: ./repo/lint-github-repo-settings.sh

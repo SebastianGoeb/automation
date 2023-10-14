@@ -29,9 +29,7 @@ check_run_id=$(echo "$check_run" | jq .id)
 echo "::endgroup::"
 
 # fetch json for the git repo we are currently in
-repo=$(gh api 'repos/{owner}/{repo}')
-
-echo "$repo" | jq
+repo=$(GITHUB_TOKEN="$LINT_REPO_SETTINGS_PAT" gh api 'repos/{owner}/{repo}')
 
 # validate what we care about
 validate_jq "$repo" '.allow_squash_merge' 'true'
