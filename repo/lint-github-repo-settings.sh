@@ -41,32 +41,31 @@ validate_jq "$repo" '.delete_branch_on_merge' 'true'
 validate_jq "$repo" '.allow_update_branch' 'true'
 validate_jq "$repo" '.use_squash_pr_title_as_default' 'true'
 
-echo "::notice file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
-echo "::warning file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
-echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
+# echo "::notice file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
+# echo "::warning file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
+# echo "::error file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
 
 num_errors="${#errors[@]}"
-
-# gh api "repos/${GITHUB_REPOSITORY}/statuses/${PR_SHA}" \
-#   -X POST \
-#   -f "state=error" \
-#   -f "description=$num_errors errors" \
-#   -f "context=continuous-integration/my-check"
 
 # report errors
 current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ "$num_errors" -ne 0 ]; then
   printf "%s\n" "${errors[@]}"
 
+  for err in "${errors[@]}"; do
+    echo "::error ::$err"
+  done
+
   json_payload=$(
     jq -n \
       --arg completed_at "$current_date" \
-      --arg summary "$num_errors errors" \
+      --arg title "$num_errors errors" \
+      --arg summary "Repo is misconfigured" \
       '{
       "conclusion": "failure",
       "completed_at": $completed_at,
       "output": {
-        "title": "Repo is Misconfigured",
+        "title": $title,
         "summary": $summary
       }
     }'
@@ -80,14 +79,20 @@ if [ "$num_errors" -ne 0 ]; then
 else
   echo "all good!"
 
-  gh api "repos/{owner}/{repo}/check-runs/$check_run_id" \
-    -X PATCH \
-    -f "{
-      \"conclusion\": \"failure\",
-      \"completed_at\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"
-      \"output\": {
-        \"title\": \"Repo Settings are Good\",
-        \"summary\": \"all good\"
+  json_payload=$(
+    jq -n \
+      --arg completed_at "$current_date" \
+      '{
+      "conclusion": "success",
+      "completed_at": $completed_at,
+      "output": {
+        "title": "All Good",
+        "summary": "Repo is configured correctly"
       }
-    }"
+    }'
+  )
+
+  gh api "repos/${GITHUB_REPOSITORY}/check-runs/$check_run_id" \
+    -X PATCH \
+    --input <(echo "$json_payload")
 fi
