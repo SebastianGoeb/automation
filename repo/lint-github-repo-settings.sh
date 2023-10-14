@@ -35,10 +35,15 @@ repo=$(GITHUB_TOKEN="$LINT_REPO_SETTINGS_PAT" gh api 'repos/{owner}/{repo}')
 validate_jq "$repo" '.allow_squash_merge' 'true'
 validate_jq "$repo" '.allow_merge_commit' 'false'
 validate_jq "$repo" '.allow_rebase_merge' 'false'
-validate_jq "$repo" '.allow_auto_merge' 'true'
 validate_jq "$repo" '.delete_branch_on_merge' 'true'
 validate_jq "$repo" '.allow_update_branch' 'true'
 validate_jq "$repo" '.use_squash_pr_title_as_default' 'true'
+
+if echo "$repo" | jq '.private' | grep 'true' >/dev/null; then
+  echo "::warning::Repo is private, skipping some validations"
+else
+  validate_jq "$repo" '.allow_auto_merge' 'true'
+fi
 
 num_errors="${#errors[@]}"
 
@@ -46,7 +51,7 @@ num_errors="${#errors[@]}"
 current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ "$num_errors" -ne 0 ]; then
   for err in "${errors[@]}"; do
-    echo "::error ::$err"
+    echo "::error::$err"
   done
 
   echo "::group::updating check run"
