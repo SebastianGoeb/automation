@@ -11,3 +11,4 @@ permissions:
 jobs:
   lint-repo-settings:
     uses: ./.github/workflows/lint-repo-settings.yml
+    secrets: inherit
