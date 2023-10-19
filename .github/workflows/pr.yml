@@ -10,7 +10,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Install shunit2
+        run: apt install -y shunit2
+
       - name: Test
-        uses: sudo-bot/action-shunit2@latest
-        with:
-          cli: "./repolint/test.sh"
+        run: "./repolint/test.sh"
