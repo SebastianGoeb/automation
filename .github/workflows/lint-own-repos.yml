@@ -20,4 +20,4 @@ jobs:
           # PR_SHA: ${{ github.event.pull_request.head.sha }}
           GITHUB_TOKEN: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
           # GITHUB_TOKEN: ${{ github.token }}
-        run: ./repo/src/lint-own-repos.sh
+        run: ./repolint/src/lint-own-repos.sh
