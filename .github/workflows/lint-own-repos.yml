@@ -1,0 +1,23 @@
+name: Lint Own Repos
+on:
+  schedule:
+    - cron: 0 4 * * *
+  pull_request:
+
+# permissions:
+#   contents: read
+#   checks: write
+
+jobs:
+  lint-own-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Lint
+        env:
+          # PR_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_TOKEN: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
+          # GITHUB_TOKEN: ${{ github.token }}
+        run: ./repo/src/lint-own-repos.sh
