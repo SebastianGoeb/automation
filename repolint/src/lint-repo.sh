@@ -13,7 +13,6 @@ repo="$1"
 
 echo "$repo"
 
-# expects $GITHUB_TOKEN
 repo_json="$(gh api "repos/$repo")"
 
 if echo "$repo_json" | jq '.private' | grep 'true' >/dev/null; then
