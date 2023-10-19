@@ -1,15 +1,15 @@
 name: Lint Own Repos
+
 on:
   schedule:
     - cron: 0 4 * * *
-  pull_request:
 
 jobs:
   lint-own-repos:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Lint
         env:

@@ -3,11 +3,14 @@ name: PR
 on:
   pull_request:
 
-permissions:
-  contents: read
-  checks: write
-
 jobs:
-  lint-repo-settings:
-    uses: ./.github/workflows/lint-repo-settings.yml
-    secrets: inherit
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Test
+        uses: sudo-bot/action-shunit2@latest
+        with:
+          cli: "./repolint/test.sh"
