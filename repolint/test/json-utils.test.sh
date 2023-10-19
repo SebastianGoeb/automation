@@ -1,7 +1,9 @@
 #!/bin/bash
 
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # shellcheck source=/dev/null
-. src/validation.sh
+. "$DIR/../src/validation.sh"
 
 ### validate_property ###
 function test_validate_property_allows_valid() {
