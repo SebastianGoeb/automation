@@ -16,9 +16,9 @@ echo "$repo"
 repo_json="$(gh api "repos/$repo")"
 
 if echo "$repo_json" | jq '.private' | grep 'true' >/dev/null; then
-  expected_json="$(cat "$DIR/../private_repo_expected.json")"
+  expected_json="$(jq '.private' "$DIR/../expected_settings.json")"
 else
-  expected_json="$(cat "$DIR/../public_repo_expected.json")"
+  expected_json="$(jq '.public' "$DIR/../expected_settings.json")"
 fi
 
 errors="$(validate_json "$expected_json" "$repo_json")"
