@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # extract own username based on login/PAT
 username="$(gh api user | jq -r '.login')"
 
@@ -8,4 +10,4 @@ username="$(gh api user | jq -r '.login')"
 # update all their settings in parallel
 gh api user/repos |
   jq -r --arg username "$username" '.[] | select(.owner.login == $username ) | .full_name' |
-  parallel --will-cite -j0 gh api --method PATCH repos/{} --input settings.json | jq -r '.full_name'
+  parallel --will-cite -j0 gh api --method PATCH repos/{} --input "$DIR/settings.json" | jq -r '.full_name'
