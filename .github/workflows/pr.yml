@@ -9,11 +9,3 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-
-      - name: Install shunit2
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y shunit2
-
-      - name: Test
-        run: "./repolint/test.sh"

@@ -15,4 +15,4 @@ jobs:
       - name: Lint
         env:
           GITHUB_TOKEN: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
-        run: ./repolint/repolint.sh
+        run: ./repo/enforce_repo_settings.sh
