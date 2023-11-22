@@ -1,4 +1,4 @@
-name: Lint Own Repos
+name: Enforce Repo Settings
 
 on:
   schedule:
@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Lint
+      - name: Enforce Settings
         env:
           GITHUB_TOKEN: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
-        run: ./repolint/repolint.sh
+        run: ./repo/enforce_settings.sh.sh

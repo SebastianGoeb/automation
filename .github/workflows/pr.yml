@@ -10,10 +10,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Install shunit2
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y shunit2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
 
-      - name: Test
-        run: "./repolint/test.sh"
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Check Formatting
+        run: npm run format:check
