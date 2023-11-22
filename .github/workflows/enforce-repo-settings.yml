@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint-own-repos:
+  enforce-settings:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -15,4 +15,4 @@ jobs:
       - name: Enforce Settings
         env:
           GITHUB_TOKEN: ${{ secrets.LINT_REPO_SETTINGS_PAT }}
-        run: ./repo/enforce_settings.sh.sh
+        run: ./repo/enforce_settings.sh
