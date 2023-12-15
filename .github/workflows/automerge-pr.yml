@@ -1,0 +1,24 @@
+# requires the following settings in calling workflow
+# permissions:
+#   contents: write
+#   pull-requests: write
+
+name: Auto-Merge Dependency PR
+on:
+  workflow_call:
+    inputs:
+      actor:
+        description: Submitter for whom PR should be automerged (e.g. dependabot[bot], renovate[bot], etc.)
+        required: true
+        type: string
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == inputs.actor }}
+    steps:
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
